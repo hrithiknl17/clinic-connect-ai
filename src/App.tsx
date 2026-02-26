@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import BookAppointment from "./pages/BookAppointment";
 import DoctorDetail from "./pages/DoctorDetail";
-import Dashboard from "./pages/Dashboard";
+
 import VideoCall from "./pages/VideoCall";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -52,7 +52,7 @@ const AnimatedRoutes = () => {
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/doctor/:doctorId" element={<DoctorDetail />} />
           <Route path="/book/:doctorId" element={<BookAppointment />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Profile />} />
           <Route path="/video-call/:appointmentId" element={<VideoCall />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
