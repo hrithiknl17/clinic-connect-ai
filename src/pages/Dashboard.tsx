@@ -1,14 +1,17 @@
 import { useState } from "react";
-import { Calendar, Clock, Activity, Plus } from "lucide-react";
+import { Calendar, Clock, Activity, Plus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import AppointmentCard from "@/components/AppointmentCard";
 import { upcomingAppointments as initialUpcoming, pastAppointments as initialPast, Appointment } from "@/lib/mockData";
 
 const Dashboard = () => {
+  const { toast } = useToast();
   const [upcoming, setUpcoming] = useState<Appointment[]>(initialUpcoming);
   const [past, setPast] = useState<Appointment[]>(initialPast);
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
 
   const handleCancel = (id: string) => {
     const apt = upcoming.find((a) => a.id === id);
@@ -21,6 +24,15 @@ const Dashboard = () => {
     setUpcoming((prev) =>
       prev.map((a) => (a.id === id ? { ...a, date: newDate, time: newTime } : a))
     );
+  };
+
+  const handleReview = (id: string, rating: number, comment: string) => {
+    setReviewedIds((prev) => new Set(prev).add(id));
+    const apt = past.find((a) => a.id === id);
+    toast({
+      title: `Review Submitted ⭐`,
+      description: `You rated ${apt?.doctorName} ${rating}/5. Thank you for your feedback!`,
+    });
   };
 
   const completedCount = past.filter((a) => a.status === "completed").length;
@@ -86,7 +98,12 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="past" className="mt-4 space-y-4">
             {past.map((apt) => (
-              <AppointmentCard key={apt.id} appointment={apt} />
+              <AppointmentCard
+                key={apt.id}
+                appointment={apt}
+                onReview={apt.status === "completed" ? handleReview : undefined}
+                reviewed={reviewedIds.has(apt.id)}
+              />
             ))}
           </TabsContent>
         </Tabs>
