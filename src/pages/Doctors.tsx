@@ -3,9 +3,12 @@ import { Input } from "@/components/ui/input";
 import DoctorCard from "@/components/DoctorCard";
 import { doctors, specialties } from "@/lib/mockData";
 import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const Doctors = () => {
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [search, setSearch] = useState(initialQuery);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
 
   const filtered = useMemo(() => {

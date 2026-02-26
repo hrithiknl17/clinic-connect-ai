@@ -75,21 +75,23 @@ const BookAppointment = () => {
         <div className="mt-6 grid gap-8 lg:grid-cols-3">
           {/* Doctor info sidebar */}
           <div className="lg:col-span-1">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-card">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full gradient-hero text-xl font-bold text-primary-foreground">
-                {doctor.avatar}
+            <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+              <div className="h-40 overflow-hidden">
+                <img src={doctor.image} alt={doctor.name} className="h-full w-full object-cover" />
               </div>
-              <h2 className="mt-4 font-heading text-xl font-bold text-foreground">{doctor.name}</h2>
-              <p className="text-sm font-medium text-primary">{doctor.specialty}</p>
-              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                <Star className="h-4 w-4 fill-warning text-warning" />
-                {doctor.rating} ({doctor.reviewCount} reviews)
+              <div className="p-5">
+                <h2 className="font-heading text-xl font-bold text-foreground">{doctor.name}</h2>
+                <p className="text-sm font-medium text-primary">{doctor.specialty}</p>
+                <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Star className="h-4 w-4 fill-warning text-warning" />
+                  {doctor.rating} ({doctor.reviewCount} reviews)
+                </div>
+                <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4" />
+                  {doctor.location}
+                </div>
+                <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{doctor.bio}</p>
               </div>
-              <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                {doctor.location}
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{doctor.bio}</p>
             </div>
           </div>
 

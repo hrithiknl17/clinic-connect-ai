@@ -3,6 +3,7 @@ export interface Doctor {
   name: string;
   specialty: string;
   avatar: string;
+  image: string;
   rating: number;
   reviewCount: number;
   nextAvailable: string;
@@ -52,6 +53,7 @@ export const doctors: Doctor[] = [
     name: "Dr. Sarah Chen",
     specialty: "Cardiology",
     avatar: "SC",
+    image: "/images/doctor-1.jpg",
     rating: 4.9,
     reviewCount: 234,
     nextAvailable: "Today",
@@ -75,6 +77,7 @@ export const doctors: Doctor[] = [
     name: "Dr. James Wilson",
     specialty: "General Practice",
     avatar: "JW",
+    image: "/images/doctor-2.jpg",
     rating: 4.8,
     reviewCount: 412,
     nextAvailable: "Today",
@@ -97,6 +100,7 @@ export const doctors: Doctor[] = [
     name: "Dr. Emily Rodriguez",
     specialty: "Dermatology",
     avatar: "ER",
+    image: "/images/doctor-3.jpg",
     rating: 4.7,
     reviewCount: 189,
     nextAvailable: "Tomorrow",
@@ -119,6 +123,7 @@ export const doctors: Doctor[] = [
     name: "Dr. Michael Park",
     specialty: "Pediatrics",
     avatar: "MP",
+    image: "/images/doctor-4.jpg",
     rating: 4.9,
     reviewCount: 567,
     nextAvailable: "Today",
@@ -142,6 +147,7 @@ export const doctors: Doctor[] = [
     name: "Dr. Lisa Thompson",
     specialty: "Orthopedics",
     avatar: "LT",
+    image: "/images/doctor-5.jpg",
     rating: 4.6,
     reviewCount: 145,
     nextAvailable: "Mar 3",
@@ -164,6 +170,7 @@ export const doctors: Doctor[] = [
     name: "Dr. David Kim",
     specialty: "Neurology",
     avatar: "DK",
+    image: "/images/doctor-6.jpg",
     rating: 4.8,
     reviewCount: 298,
     nextAvailable: "Tomorrow",

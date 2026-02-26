@@ -33,10 +33,11 @@ const DoctorDetail = () => {
         <div className="mt-6 grid gap-8 lg:grid-cols-3">
           {/* Left column — profile card */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-card text-center">
-              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full gradient-hero text-3xl font-bold text-primary-foreground">
-                {doctor.avatar}
+            <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
+              <div className="h-48 overflow-hidden">
+                <img src={doctor.image} alt={doctor.name} className="h-full w-full object-cover" />
               </div>
+              <div className="p-6 text-center">
               <h1 className="mt-4 font-heading text-2xl font-bold text-foreground">{doctor.name}</h1>
               <Badge variant="outline" className="mt-1 bg-primary/10 text-primary border-primary/20">
                 {doctor.specialty}
@@ -80,6 +81,7 @@ const DoctorDetail = () => {
               <Button asChild className="mt-6 w-full shadow-hero">
                 <Link to={`/book/${doctor.id}`}>Book Appointment</Link>
               </Button>
+              </div>
             </div>
           </div>
 
