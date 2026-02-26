@@ -1,12 +1,182 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Search, Calendar, Shield, Clock, ArrowRight, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Link } from "react-router-dom";
+import DoctorCard from "@/components/DoctorCard";
+import { doctors, specialties } from "@/lib/mockData";
+import { useState } from "react";
+
+const stats = [
+  { label: "Licensed Doctors", value: "500+" },
+  { label: "Appointments Booked", value: "50K+" },
+  { label: "Patient Satisfaction", value: "98%" },
+];
+
+const features = [
+  {
+    icon: Calendar,
+    title: "Easy Scheduling",
+    desc: "Book appointments in seconds with our intuitive calendar. Choose your preferred date, time, and doctor.",
+  },
+  {
+    icon: Clock,
+    title: "Real-time Availability",
+    desc: "See live doctor availability and get instant confirmations. No more waiting on hold.",
+  },
+  {
+    icon: Shield,
+    title: "Secure & Private",
+    desc: "Your health data is protected with enterprise-grade encryption and HIPAA-compliant infrastructure.",
+  },
+];
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const featuredDoctors = doctors.slice(0, 3);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen">
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 gradient-hero opacity-[0.04]" />
+        <div className="container mx-auto px-4 py-20 md:py-28">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary px-4 py-1.5 text-sm font-medium text-secondary-foreground">
+              <Star className="h-4 w-4 fill-primary text-primary" />
+              Trusted by 50,000+ patients
+            </div>
+            <h1 className="text-4xl font-extrabold leading-tight text-foreground md:text-6xl">
+              Your Health,{" "}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Simplified
+              </span>
+            </h1>
+            <p className="mt-5 text-lg text-muted-foreground md:text-xl">
+              Find top-rated doctors, book appointments instantly, and manage your healthcare journey — all in one place.
+            </p>
+
+            {/* Search bar */}
+            <div className="mx-auto mt-10 flex max-w-xl gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search by doctor, specialty, or condition..."
+                  className="h-12 pl-10 text-base"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button asChild size="lg" className="h-12 px-6 shadow-hero">
+                <Link to="/doctors">Search</Link>
+              </Button>
+            </div>
+
+            {/* Specialty pills */}
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {specialties.slice(0, 5).map((s) => (
+                <Link
+                  key={s}
+                  to="/doctors"
+                  className="rounded-full border border-border bg-card px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
+                >
+                  {s}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="mx-auto mt-16 grid max-w-2xl grid-cols-3 gap-8">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-3xl font-bold text-foreground md:text-4xl">{s.value}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="border-t border-border bg-muted/40 py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-center text-3xl font-bold text-foreground md:text-4xl">
+            Why patients choose MediBook
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
+            A smarter way to manage your healthcare appointments
+          </p>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {features.map((f, i) => (
+              <div
+                key={f.title}
+                className="rounded-xl border border-border bg-card p-6 shadow-card animate-fade-in"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-primary">
+                  <f.icon className="h-6 w-6" />
+                </div>
+                <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">{f.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Doctors */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground md:text-4xl">Top-Rated Doctors</h2>
+              <p className="mt-2 text-muted-foreground">Trusted professionals ready to help</p>
+            </div>
+            <Button asChild variant="ghost" className="hidden md:flex">
+              <Link to="/doctors">
+                View all <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {featuredDoctors.map((doc, i) => (
+              <DoctorCard key={doc.id} doctor={doc} index={i} />
+            ))}
+          </div>
+          <div className="mt-8 text-center md:hidden">
+            <Button asChild variant="outline">
+              <Link to="/doctors">View all doctors</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-t border-border bg-muted/40 py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-foreground md:text-4xl">
+            Ready to take control of your health?
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
+            Join thousands of patients who trust MediBook for their healthcare needs.
+          </p>
+          <div className="mt-8 flex justify-center gap-3">
+            <Button asChild size="lg" className="shadow-hero">
+              <Link to="/doctors">Find a Doctor</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/dashboard">View Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-10">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          © 2026 MediBook. All rights reserved. Your health data is secure and encrypted.
+        </div>
+      </footer>
     </div>
   );
 };
