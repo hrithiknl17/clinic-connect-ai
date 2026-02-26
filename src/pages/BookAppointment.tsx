@@ -1,10 +1,13 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, MapPin, Check, Calendar as CalIcon } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Check, Calendar as CalIcon, Video, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { doctors, generateTimeSlots } from "@/lib/mockData";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+
+type AppointmentType = "in-person" | "video";
 
 const BookAppointment = () => {
   const { doctorId } = useParams();
@@ -14,6 +17,7 @@ const BookAppointment = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [appointmentType, setAppointmentType] = useState<AppointmentType>("in-person");
   const [step, setStep] = useState<"select" | "confirm" | "done">("select");
 
   const timeSlots = selectedDate ? generateTimeSlots(selectedDate) : [];
@@ -33,7 +37,7 @@ const BookAppointment = () => {
     setStep("done");
     toast({
       title: "Appointment Confirmed! ✓",
-      description: `Your appointment with ${doctor.name} has been booked.`,
+      description: `Your ${appointmentType === "video" ? "video call" : "in-person"} appointment with ${doctor.name} has been booked.`,
     });
   };
 
@@ -45,10 +49,16 @@ const BookAppointment = () => {
         </div>
         <h1 className="mt-6 text-3xl font-bold text-foreground">Booking Confirmed!</h1>
         <p className="mt-3 text-muted-foreground">
-          Your appointment with <strong>{doctor.name}</strong> on{" "}
+          Your {appointmentType === "video" ? "video call" : "in-person"} appointment with{" "}
+          <strong>{doctor.name}</strong> on{" "}
           {selectedDate?.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })} at{" "}
           {selectedSlot} has been confirmed.
         </p>
+        {appointmentType === "video" && (
+          <p className="mt-2 text-sm text-primary font-medium">
+            📹 A video call link will be available in your dashboard before the appointment.
+          </p>
+        )}
         <p className="mt-1 text-sm text-muted-foreground">A confirmation email has been sent to your inbox.</p>
         <div className="mt-8 flex justify-center gap-3">
           <Button asChild>
@@ -101,6 +111,53 @@ const BookAppointment = () => {
               <div className="animate-fade-in">
                 <h1 className="text-2xl font-bold text-foreground md:text-3xl">Select Date & Time</h1>
                 <p className="mt-1 text-muted-foreground">Choose a convenient time for your visit</p>
+
+                {/* Appointment Type Toggle */}
+                <div className="mt-6">
+                  <h3 className="font-heading text-sm font-semibold text-foreground mb-3">Appointment Type</h3>
+                  <div className="grid grid-cols-2 gap-3 max-w-md">
+                    <button
+                      onClick={() => setAppointmentType("in-person")}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all",
+                        appointmentType === "in-person"
+                          ? "border-primary bg-primary/5 shadow-hero"
+                          : "border-border bg-card hover:border-primary/30"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-lg",
+                        appointmentType === "in-person" ? "bg-primary/10" : "bg-secondary"
+                      )}>
+                        <Building2 className={cn("h-5 w-5", appointmentType === "in-person" ? "text-primary" : "text-muted-foreground")} />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm text-foreground">In-Person</div>
+                        <div className="text-xs text-muted-foreground">Visit the clinic</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setAppointmentType("video")}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all",
+                        appointmentType === "video"
+                          ? "border-accent bg-accent/5 shadow-hero"
+                          : "border-border bg-card hover:border-accent/30"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-lg",
+                        appointmentType === "video" ? "bg-accent/10" : "bg-secondary"
+                      )}>
+                        <Video className={cn("h-5 w-5", appointmentType === "video" ? "text-accent" : "text-muted-foreground")} />
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm text-foreground">Video Call</div>
+                        <div className="text-xs text-muted-foreground">Meet online</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
 
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                   <div className="rounded-xl border border-border bg-card p-4 shadow-card">
@@ -175,6 +232,16 @@ const BookAppointment = () => {
                       <span className="font-medium text-foreground">{doctor.specialty}</span>
                     </div>
                     <div className="flex justify-between border-b border-border pb-3">
+                      <span className="text-muted-foreground">Type</span>
+                      <span className="flex items-center gap-1.5 font-medium text-foreground">
+                        {appointmentType === "video" ? (
+                          <><Video className="h-4 w-4 text-accent" /> Video Call</>
+                        ) : (
+                          <><Building2 className="h-4 w-4 text-primary" /> In-Person</>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-border pb-3">
                       <span className="text-muted-foreground">Date</span>
                       <span className="font-medium text-foreground">
                         {selectedDate?.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
@@ -185,8 +252,12 @@ const BookAppointment = () => {
                       <span className="font-medium text-foreground">{selectedSlot}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Location</span>
-                      <span className="font-medium text-foreground">{doctor.location}</span>
+                      <span className="text-muted-foreground">
+                        {appointmentType === "video" ? "Platform" : "Location"}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {appointmentType === "video" ? "MediBook Video" : doctor.location}
+                      </span>
                     </div>
                   </div>
                 </div>

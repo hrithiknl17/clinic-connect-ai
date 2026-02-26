@@ -34,6 +34,7 @@ export interface Appointment {
   time: string;
   status: "upcoming" | "completed" | "cancelled";
   location: string;
+  type: "in-person" | "video";
 }
 
 export const specialties = [
@@ -217,6 +218,7 @@ export const upcomingAppointments: Appointment[] = [
     time: "10:00 AM",
     status: "upcoming",
     location: "Downtown Medical Center",
+    type: "in-person",
   },
   {
     id: "apt-2",
@@ -227,6 +229,7 @@ export const upcomingAppointments: Appointment[] = [
     time: "2:30 PM",
     status: "upcoming",
     location: "Children's Wellness Center",
+    type: "video",
   },
 ];
 
@@ -240,6 +243,7 @@ export const pastAppointments: Appointment[] = [
     time: "11:00 AM",
     status: "completed",
     location: "Westside Family Clinic",
+    type: "in-person",
   },
   {
     id: "apt-4",
@@ -250,5 +254,6 @@ export const pastAppointments: Appointment[] = [
     time: "3:00 PM",
     status: "cancelled",
     location: "Skin Health Institute",
+    type: "video",
   },
 ];
