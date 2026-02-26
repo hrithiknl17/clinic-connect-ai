@@ -1,11 +1,12 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, MapPin, Check, Calendar as CalIcon, Video, Building2 } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Check, Calendar as CalIcon, Video, Building2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { doctors, generateTimeSlots } from "@/lib/mockData";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AppointmentType = "in-person" | "video";
 
@@ -13,6 +14,7 @@ const BookAppointment = () => {
   const { doctorId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading } = useAuth();
   const doctor = doctors.find((d) => d.id === doctorId);
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -29,6 +31,38 @@ const BookAppointment = () => {
         <Button asChild className="mt-4">
           <Link to="/doctors">Browse Doctors</Link>
         </Button>
+      </div>
+    );
+  }
+
+  // Auth guard: redirect to login if not authenticated
+  if (!loading && !user) {
+    return (
+      <div className="container mx-auto px-4 py-20 text-center animate-fade-in">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+          <Shield className="h-10 w-10 text-primary" />
+        </div>
+        <h1 className="mt-6 text-3xl font-bold text-foreground">Sign In Required</h1>
+        <p className="mt-3 text-muted-foreground">
+          Please log in to book an appointment with <strong>{doctor.name}</strong>.
+        </p>
+        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4 max-w-md mx-auto">
+          <div className="flex items-center gap-2 justify-center">
+            <Shield className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-foreground">Your data is safe with us</span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            We use industry-standard encryption to protect your personal and medical information.
+          </p>
+        </div>
+        <div className="mt-8 flex justify-center gap-3">
+          <Button onClick={() => navigate("/auth")} size="lg" className="shadow-hero">
+            Sign In to Book
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/doctors">Back to Doctors</Link>
+          </Button>
+        </div>
       </div>
     );
   }

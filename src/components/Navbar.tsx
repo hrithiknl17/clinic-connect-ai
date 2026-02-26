@@ -1,7 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Calendar, Search, User, Menu, X, Heart } from "lucide-react";
+import { Calendar, Search, User, Menu, X, Heart, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -11,7 +13,14 @@ const navLinks = [
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
@@ -41,10 +50,25 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="outline" size="sm">
-            Log in
-          </Button>
-          <Button size="sm">Sign up</Button>
+          {user ? (
+            <>
+              <span className="text-sm text-muted-foreground truncate max-w-[160px]">
+                {user.email}
+              </span>
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-1" /> Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/auth">Log in</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/auth">Sign up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -75,8 +99,20 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="mt-2 flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">Log in</Button>
-              <Button size="sm" className="flex-1">Sign up</Button>
+              {user ? (
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
+                  <LogOut className="h-4 w-4 mr-1" /> Sign out
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" className="flex-1" asChild>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Log in</Link>
+                  </Button>
+                  <Button size="sm" className="flex-1" asChild>
+                    <Link to="/auth" onClick={() => setMobileOpen(false)}>Sign up</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
