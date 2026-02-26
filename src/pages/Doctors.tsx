@@ -1,18 +1,29 @@
-import { Search } from "lucide-react";
+import { Search, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import DoctorCard from "@/components/DoctorCard";
 import { doctors, specialties } from "@/lib/mockData";
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+
+type SortOption = "default" | "rating-high" | "rating-low" | "reviews";
+
+const sortLabels: Record<SortOption, string> = {
+  default: "Default",
+  "rating-high": "Highest Rated",
+  "rating-low": "Lowest Rated",
+  reviews: "Most Reviews",
+};
 
 const Doctors = () => {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [search, setSearch] = useState(initialQuery);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("default");
 
   const filtered = useMemo(() => {
-    return doctors.filter((d) => {
+    let results = doctors.filter((d) => {
       const matchesSearch =
         !search ||
         d.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -20,7 +31,27 @@ const Doctors = () => {
       const matchesSpecialty = !selectedSpecialty || d.specialty === selectedSpecialty;
       return matchesSearch && matchesSpecialty;
     });
-  }, [search, selectedSpecialty]);
+
+    switch (sortBy) {
+      case "rating-high":
+        results = [...results].sort((a, b) => b.rating - a.rating);
+        break;
+      case "rating-low":
+        results = [...results].sort((a, b) => a.rating - b.rating);
+        break;
+      case "reviews":
+        results = [...results].sort((a, b) => b.reviewCount - a.reviewCount);
+        break;
+    }
+
+    return results;
+  }, [search, selectedSpecialty, sortBy]);
+
+  const cycleSortOption = () => {
+    const options: SortOption[] = ["default", "rating-high", "rating-low", "reviews"];
+    const currentIndex = options.indexOf(sortBy);
+    setSortBy(options[(currentIndex + 1) % options.length]);
+  };
 
   return (
     <div className="min-h-screen py-8">
@@ -39,31 +70,40 @@ const Doctors = () => {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={cycleSortOption}
+            className="w-fit gap-2"
+          >
+            <ArrowUpDown className="h-4 w-4" />
+            Sort: {sortLabels[sortBy]}
+          </Button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedSpecialty(null)}
+            className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              !selectedSpecialty
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-muted"
+            }`}
+          >
+            All
+          </button>
+          {specialties.map((s) => (
             <button
-              onClick={() => setSelectedSpecialty(null)}
+              key={s}
+              onClick={() => setSelectedSpecialty(selectedSpecialty === s ? null : s)}
               className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                !selectedSpecialty
+                selectedSpecialty === s
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-secondary-foreground hover:bg-muted"
               }`}
             >
-              All
+              {s}
             </button>
-            {specialties.map((s) => (
-              <button
-                key={s}
-                onClick={() => setSelectedSpecialty(selectedSpecialty === s ? null : s)}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                  selectedSpecialty === s
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-muted"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* Results */}
