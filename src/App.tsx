@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
@@ -11,6 +12,7 @@ import BookAppointment from "./pages/BookAppointment";
 import DoctorDetail from "./pages/DoctorDetail";
 import Dashboard from "./pages/Dashboard";
 import VideoCall from "./pages/VideoCall";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,7 @@ const AnimatedRoutes = () => {
       >
         <Routes location={location}>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/doctor/:doctorId" element={<DoctorDetail />} />
           <Route path="/book/:doctorId" element={<BookAppointment />} />
@@ -60,8 +63,10 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Navbar />
-        <AnimatedRoutes />
+        <AuthProvider>
+          <Navbar />
+          <AnimatedRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
