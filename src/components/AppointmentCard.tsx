@@ -1,10 +1,23 @@
-import { Calendar, Clock, MapPin, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { Appointment } from "@/lib/mockData";
 
 interface AppointmentCardProps {
   appointment: Appointment;
+  onCancel?: (id: string) => void;
 }
 
 const statusStyles: Record<string, string> = {
@@ -13,7 +26,7 @@ const statusStyles: Record<string, string> = {
   cancelled: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
-const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
+const AppointmentCard = ({ appointment, onCancel }: AppointmentCardProps) => {
   const formattedDate = new Date(appointment.date).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -45,12 +58,33 @@ const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
           {appointment.location}
         </span>
       </div>
-      {appointment.status === "upcoming" && (
+      {appointment.status === "upcoming" && onCancel && (
         <div className="mt-4 flex gap-2">
           <Button variant="outline" size="sm">Reschedule</Button>
-          <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
-            Cancel
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
+                Cancel
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel Appointment?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to cancel your appointment with {appointment.doctorName} on {formattedDate} at {appointment.time}?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep Appointment</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onCancel(appointment.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Yes, Cancel
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </div>
