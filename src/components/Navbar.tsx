@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/doctors", label: "Find Doctors" },
-  { to: "/dashboard", label: "My Appointments" },
 ];
 
 const Navbar = () => {
