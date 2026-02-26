@@ -52,9 +52,11 @@ const Navbar = () => {
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
-              <span className="text-sm text-muted-foreground truncate max-w-[160px]">
-                {user.email}
-              </span>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/profile" className="flex items-center gap-1">
+                  <User className="h-4 w-4" /> Profile
+                </Link>
+              </Button>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4 mr-1" /> Sign out
               </Button>
