@@ -1,17 +1,31 @@
+import { useState } from "react";
 import { Calendar, Clock, Activity, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import AppointmentCard from "@/components/AppointmentCard";
-import { upcomingAppointments, pastAppointments } from "@/lib/mockData";
-
-const statCards = [
-  { label: "Upcoming", value: upcomingAppointments.length, icon: Calendar, color: "text-primary" },
-  { label: "Completed", value: pastAppointments.filter((a) => a.status === "completed").length, icon: Activity, color: "text-success" },
-  { label: "Cancelled", value: pastAppointments.filter((a) => a.status === "cancelled").length, icon: Clock, color: "text-destructive" },
-];
+import { upcomingAppointments as initialUpcoming, pastAppointments as initialPast, Appointment } from "@/lib/mockData";
 
 const Dashboard = () => {
+  const [upcoming, setUpcoming] = useState<Appointment[]>(initialUpcoming);
+  const [past, setPast] = useState<Appointment[]>(initialPast);
+
+  const handleCancel = (id: string) => {
+    const apt = upcoming.find((a) => a.id === id);
+    if (!apt) return;
+    setUpcoming((prev) => prev.filter((a) => a.id !== id));
+    setPast((prev) => [{ ...apt, status: "cancelled" as const }, ...prev]);
+  };
+
+  const completedCount = past.filter((a) => a.status === "completed").length;
+  const cancelledCount = past.filter((a) => a.status === "cancelled").length;
+
+  const statCards = [
+    { label: "Upcoming", value: upcoming.length, icon: Calendar, color: "text-primary" },
+    { label: "Completed", value: completedCount, icon: Activity, color: "text-success" },
+    { label: "Cancelled", value: cancelledCount, icon: Clock, color: "text-destructive" },
+  ];
+
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
@@ -51,9 +65,9 @@ const Dashboard = () => {
             <TabsTrigger value="past">Past</TabsTrigger>
           </TabsList>
           <TabsContent value="upcoming" className="mt-4 space-y-4">
-            {upcomingAppointments.length > 0 ? (
-              upcomingAppointments.map((apt) => (
-                <AppointmentCard key={apt.id} appointment={apt} />
+            {upcoming.length > 0 ? (
+              upcoming.map((apt) => (
+                <AppointmentCard key={apt.id} appointment={apt} onCancel={handleCancel} />
               ))
             ) : (
               <div className="rounded-xl border border-border bg-card p-12 text-center">
@@ -65,7 +79,7 @@ const Dashboard = () => {
             )}
           </TabsContent>
           <TabsContent value="past" className="mt-4 space-y-4">
-            {pastAppointments.map((apt) => (
+            {past.map((apt) => (
               <AppointmentCard key={apt.id} appointment={apt} />
             ))}
           </TabsContent>
