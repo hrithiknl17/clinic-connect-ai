@@ -1,10 +1,44 @@
-import { Search, Calendar, Shield, Clock, ArrowRight, Star, Heart } from "lucide-react";
+import { Search, Calendar, Shield, Clock, ArrowRight, Star, Heart, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import DoctorCard from "@/components/DoctorCard";
 import { doctors, specialties } from "@/lib/mockData";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+
+const articles = [
+  {
+    id: "1",
+    title: "Understanding Heart Health: What Every Patient Should Know",
+    excerpt: "Learn about the key indicators of cardiovascular wellness and simple lifestyle changes that can make a big difference.",
+    author: "Dr. Sarah Chen",
+    specialty: "Cardiology",
+    date: "Feb 24, 2026",
+    readTime: "5 min read",
+    image: "/images/doctor-1.jpg",
+  },
+  {
+    id: "2",
+    title: "The Importance of Annual Check-Ups for Preventive Care",
+    excerpt: "Regular health screenings can catch potential issues early. Here's what to expect and why it matters.",
+    author: "Dr. James Wilson",
+    specialty: "General Practice",
+    date: "Feb 20, 2026",
+    readTime: "4 min read",
+    image: "/images/doctor-2.jpg",
+  },
+  {
+    id: "3",
+    title: "Skin Care Myths Debunked by a Dermatologist",
+    excerpt: "From SPF confusion to miracle creams — a board-certified dermatologist separates fact from fiction.",
+    author: "Dr. Emily Rodriguez",
+    specialty: "Dermatology",
+    date: "Feb 18, 2026",
+    readTime: "6 min read",
+    image: "/images/doctor-3.jpg",
+  },
+];
 
 const stats = [
   { label: "Licensed Doctors", value: "500+" },
@@ -192,6 +226,62 @@ const Index = () => {
             <Button asChild variant="outline">
               <Link to="/doctors">View all doctors</Link>
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Health Articles */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between">
+            <div>
+              <div className="mb-2 inline-flex items-center gap-2 text-primary">
+                <BookOpen className="h-5 w-5" />
+                <span className="text-sm font-semibold uppercase tracking-wider">Expert Insights</span>
+              </div>
+              <h2 className="text-3xl font-bold text-foreground md:text-4xl">
+                Read Top Articles from Health Experts
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Stay informed with the latest health advice from our doctors
+              </p>
+            </div>
+          </div>
+          <div className="mt-10 grid gap-8 md:grid-cols-3">
+            {articles.map((article, i) => (
+              <article
+                key={article.id}
+                className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 animate-fade-in"
+                style={{ animationDelay: `${i * 120}ms` }}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={article.image}
+                    alt={article.author}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
+                  <Badge className="absolute bottom-3 left-3 bg-primary/90 text-primary-foreground hover:bg-primary">
+                    {article.specialty}
+                  </Badge>
+                </div>
+                <div className="flex flex-1 flex-col p-5">
+                  <h3 className="font-heading text-lg font-semibold leading-snug text-foreground group-hover:text-primary transition-colors">
+                    {article.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                    {article.excerpt}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+                    <div className="text-sm">
+                      <span className="font-medium text-foreground">{article.author}</span>
+                      <span className="ml-2 text-muted-foreground">· {article.date}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{article.readTime}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
