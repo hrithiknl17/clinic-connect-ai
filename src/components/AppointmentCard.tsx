@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin, Video, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,6 +62,8 @@ const AppointmentCard = ({ appointment, onCancel, onReschedule }: AppointmentCar
     setSelectedSlot(null);
   };
 
+  const isVideo = appointment.type === "video";
+
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card transition-all hover:shadow-card-hover">
       <div className="flex items-start justify-between">
@@ -68,9 +71,16 @@ const AppointmentCard = ({ appointment, onCancel, onReschedule }: AppointmentCar
           <h3 className="font-heading font-semibold text-foreground">{appointment.doctorName}</h3>
           <p className="text-sm text-primary font-medium">{appointment.specialty}</p>
         </div>
-        <Badge variant="outline" className={statusStyles[appointment.status]}>
-          {appointment.status}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {isVideo && (
+            <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+              <Video className="h-3 w-3 mr-1" /> Video
+            </Badge>
+          )}
+          <Badge variant="outline" className={statusStyles[appointment.status]}>
+            {appointment.status}
+          </Badge>
+        </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
         <span className="flex items-center gap-1.5">
@@ -82,12 +92,21 @@ const AppointmentCard = ({ appointment, onCancel, onReschedule }: AppointmentCar
           {appointment.time}
         </span>
         <span className="flex items-center gap-1.5">
-          <MapPin className="h-4 w-4" />
-          {appointment.location}
+          {isVideo ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+          {isVideo ? "MediBook Video" : appointment.location}
         </span>
       </div>
       {appointment.status === "upcoming" && onCancel && (
         <div className="mt-4 flex gap-2">
+          {/* Join Video Call */}
+          {isVideo && (
+            <Button asChild size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Link to={`/video-call/${appointment.id}`}>
+                <Video className="mr-1 h-3.5 w-3.5" /> Join Call
+              </Link>
+            </Button>
+          )}
+
           {/* Reschedule Dialog */}
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
