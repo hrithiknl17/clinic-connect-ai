@@ -17,6 +17,12 @@ const Dashboard = () => {
     setPast((prev) => [{ ...apt, status: "cancelled" as const }, ...prev]);
   };
 
+  const handleReschedule = (id: string, newDate: string, newTime: string) => {
+    setUpcoming((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, date: newDate, time: newTime } : a))
+    );
+  };
+
   const completedCount = past.filter((a) => a.status === "completed").length;
   const cancelledCount = past.filter((a) => a.status === "cancelled").length;
 
@@ -67,7 +73,7 @@ const Dashboard = () => {
           <TabsContent value="upcoming" className="mt-4 space-y-4">
             {upcoming.length > 0 ? (
               upcoming.map((apt) => (
-                <AppointmentCard key={apt.id} appointment={apt} onCancel={handleCancel} />
+                <AppointmentCard key={apt.id} appointment={apt} onCancel={handleCancel} onReschedule={handleReschedule} />
               ))
             ) : (
               <div className="rounded-xl border border-border bg-card p-12 text-center">

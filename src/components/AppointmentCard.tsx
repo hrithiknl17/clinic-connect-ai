@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
+import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,11 +16,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import type { Appointment } from "@/lib/mockData";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { generateTimeSlots, type Appointment } from "@/lib/mockData";
 
 interface AppointmentCardProps {
   appointment: Appointment;
   onCancel?: (id: string) => void;
+  onReschedule?: (id: string, newDate: string, newTime: string) => void;
 }
 
 const statusStyles: Record<string, string> = {
@@ -26,12 +40,26 @@ const statusStyles: Record<string, string> = {
   cancelled: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
-const AppointmentCard = ({ appointment, onCancel }: AppointmentCardProps) => {
+const AppointmentCard = ({ appointment, onCancel, onReschedule }: AppointmentCardProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date(appointment.date));
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const timeSlots = selectedDate ? generateTimeSlots(selectedDate) : [];
+
   const formattedDate = new Date(appointment.date).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
   });
+
+  const handleReschedule = () => {
+    if (!selectedDate || !selectedSlot || !onReschedule) return;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    onReschedule(appointment.id, dateStr, selectedSlot);
+    setDialogOpen(false);
+    setSelectedSlot(null);
+  };
 
   return (
     <div className="rounded-xl border border-border bg-card p-5 shadow-card transition-all hover:shadow-card-hover">
@@ -46,7 +74,7 @@ const AppointmentCard = ({ appointment, onCancel }: AppointmentCardProps) => {
       </div>
       <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <Calendar className="h-4 w-4" />
+          <CalendarIcon className="h-4 w-4" />
           {formattedDate}
         </span>
         <span className="flex items-center gap-1.5">
@@ -60,7 +88,68 @@ const AppointmentCard = ({ appointment, onCancel }: AppointmentCardProps) => {
       </div>
       {appointment.status === "upcoming" && onCancel && (
         <div className="mt-4 flex gap-2">
-          <Button variant="outline" size="sm">Reschedule</Button>
+          {/* Reschedule Dialog */}
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">Reschedule</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Reschedule Appointment</DialogTitle>
+                <DialogDescription>
+                  Pick a new date and time for your appointment with {appointment.doctorName}.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(d) => {
+                    setSelectedDate(d);
+                    setSelectedSlot(null);
+                  }}
+                  disabled={(date) => date < new Date()}
+                  className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
+                />
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-foreground">
+                    {selectedDate
+                      ? format(selectedDate, "EEEE, MMMM d")
+                      : "Select a date"}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 max-h-[260px] overflow-y-auto pr-1">
+                    {timeSlots.map((slot) => (
+                      <button
+                        key={slot.id}
+                        disabled={!slot.available}
+                        onClick={() => setSelectedSlot(slot.time)}
+                        className={cn(
+                          "rounded-lg border px-3 py-2 text-sm font-medium transition-all",
+                          selectedSlot === slot.time
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : slot.available
+                            ? "border-border bg-card text-foreground hover:border-primary/50 hover:bg-secondary"
+                            : "cursor-not-allowed border-border bg-muted text-muted-foreground/40"
+                        )}
+                      >
+                        {slot.time}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button disabled={!selectedSlot} onClick={handleReschedule}>
+                  Confirm Reschedule
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Cancel Dialog */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
