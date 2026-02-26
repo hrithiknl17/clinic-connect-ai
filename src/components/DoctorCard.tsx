@@ -14,7 +14,7 @@ const DoctorCard = ({ doctor, index = 0 }: DoctorCardProps) => {
       className="group rounded-xl border border-border bg-card p-5 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5 animate-fade-in"
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      <div className="flex gap-4">
+      <Link to={`/doctor/${doctor.id}`} className="flex gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full gradient-hero text-lg font-bold text-primary-foreground">
           {doctor.avatar}
         </div>
@@ -34,7 +34,7 @@ const DoctorCard = ({ doctor, index = 0 }: DoctorCardProps) => {
             </span>
           </div>
         </div>
-      </div>
+      </Link>
       <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{doctor.bio}</p>
       <div className="mt-4 flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-sm font-medium text-success">

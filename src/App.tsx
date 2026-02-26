@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import BookAppointment from "./pages/BookAppointment";
+import DoctorDetail from "./pages/DoctorDetail";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/doctors" element={<Doctors />} />
+          <Route path="/doctor/:doctorId" element={<DoctorDetail />} />
           <Route path="/book/:doctorId" element={<BookAppointment />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
