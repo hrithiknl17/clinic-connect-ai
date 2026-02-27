@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import DoctorCard from "@/components/DoctorCard";
+import VideoTestimonials from "@/components/VideoTestimonials";
 import { doctors, specialties } from "@/lib/mockData";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -229,6 +230,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Video Testimonials */}
+      <VideoTestimonials />
 
       {/* Health Articles */}
       <section className="py-20">
