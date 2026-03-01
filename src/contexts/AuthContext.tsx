@@ -1,52 +1,45 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import { createContext, useContext, useState, ReactNode } from "react";
+
+interface DemoUser {
+  id: string;
+  email: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: DemoUser | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signIn: (email: string) => void;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  session: null,
-  loading: true,
-  signOut: async () => {},
+  loading: false,
+  signIn: () => {},
+  signOut: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<DemoUser | null>(() => {
+    const saved = localStorage.getItem("demo_user");
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+  const signIn = (email: string) => {
+    const demoUser = { id: "demo-1", email };
+    setUser(demoUser);
+    localStorage.setItem("demo_user", JSON.stringify(demoUser));
+  };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = () => {
+    setUser(null);
+    localStorage.removeItem("demo_user");
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, loading: false, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import {
-  User, Mail, Phone, MapPin, Calendar, Save, ArrowLeft,
+  User, Mail, Phone, MapPin, Calendar, Save,
   Clock, Activity, Plus, Star,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import AppointmentCard from "@/components/AppointmentCard";
 import {
   upcomingAppointments as initialUpcoming,
@@ -19,85 +17,30 @@ import {
   Appointment,
 } from "@/lib/mockData";
 
-interface ProfileData {
-  display_name: string | null;
-  phone: string | null;
-  date_of_birth: string | null;
-  address: string | null;
-  avatar_url: string | null;
-}
-
 const Profile = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<ProfileData>({
-    display_name: "",
-    phone: "",
-    date_of_birth: "",
-    address: "",
-    avatar_url: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
 
-  // Appointments state
+  const [displayName, setDisplayName] = useState("Demo User");
+  const [phone, setPhone] = useState("+1 (555) 123-4567");
+  const [dob, setDob] = useState("1990-01-15");
+  const [address, setAddress] = useState("123 Main St, City, State");
+
   const [upcoming, setUpcoming] = useState<Appointment[]>(initialUpcoming);
   const [past, setPast] = useState<Appointment[]>(initialPast);
   const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
-      return;
-    }
-    if (user) {
-      fetchProfile();
-    }
-  }, [user, authLoading]);
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
 
-  const fetchProfile = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("display_name, phone, date_of_birth, address, avatar_url")
-      .eq("user_id", user!.id)
-      .single();
-
-    if (data) {
-      setProfile({
-        display_name: data.display_name || "",
-        phone: data.phone || "",
-        date_of_birth: data.date_of_birth || "",
-        address: data.address || "",
-        avatar_url: data.avatar_url || "",
-      });
-    }
-    setLoading(false);
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        display_name: profile.display_name || null,
-        phone: profile.phone || null,
-        date_of_birth: profile.date_of_birth || null,
-        address: profile.address || null,
-      })
-      .eq("user_id", user!.id);
-
-    if (error) {
-      toast({ title: "Error saving profile", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Profile updated!" });
-    }
-    setSaving(false);
+    toast({ title: "Profile updated!" });
   };
 
-  // Appointment handlers
   const handleCancel = (id: string) => {
     const apt = upcoming.find((a) => a.id === id);
     if (!apt) return;
@@ -116,7 +59,7 @@ const Profile = () => {
     const apt = past.find((a) => a.id === id);
     toast({
       title: `Review Submitted ⭐`,
-      description: `You rated ${apt?.doctorName} ${rating}/5. Thank you for your feedback!`,
+      description: `You rated ${apt?.doctorName} ${rating}/5. Thank you!`,
     });
   };
 
@@ -129,38 +72,27 @@ const Profile = () => {
     { label: "Cancelled", value: cancelledCount, icon: Clock, color: "text-destructive" },
   ];
 
-  if (authLoading || loading) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header with avatar */}
         <div className="flex items-center gap-4">
           <div className="flex h-20 w-20 items-center justify-center rounded-full gradient-hero text-2xl font-bold text-primary-foreground">
-            {(profile.display_name || user?.email || "U").charAt(0).toUpperCase()}
+            {displayName.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{profile.display_name || "User"}</h1>
+            <h1 className="text-3xl font-bold text-foreground">{displayName}</h1>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <Mail className="h-3 w-3" /> {user?.email}
+              <Mail className="h-3 w-3" /> {user.email}
             </p>
           </div>
         </div>
 
-        {/* Main tabs: Profile + Appointments */}
         <Tabs defaultValue="appointments" className="mt-8">
           <TabsList>
             <TabsTrigger value="appointments">My Appointments</TabsTrigger>
             <TabsTrigger value="profile">Personal Info</TabsTrigger>
           </TabsList>
 
-          {/* Appointments tab */}
           <TabsContent value="appointments" className="mt-6">
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">Manage your upcoming and past visits</p>
@@ -171,7 +103,6 @@ const Profile = () => {
               </Button>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               {statCards.map((s) => (
                 <div key={s.label} className="rounded-xl border border-border bg-card p-4 shadow-card">
@@ -188,7 +119,6 @@ const Profile = () => {
               ))}
             </div>
 
-            {/* Sub-tabs for upcoming / past */}
             <Tabs defaultValue="upcoming">
               <TabsList>
                 <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
@@ -221,61 +151,34 @@ const Profile = () => {
             </Tabs>
           </TabsContent>
 
-          {/* Profile tab */}
           <TabsContent value="profile" className="mt-6">
             <form onSubmit={handleSave} className="rounded-xl border border-border bg-card p-6 shadow-card space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="name" className="flex items-center gap-1.5">
                   <User className="h-4 w-4 text-muted-foreground" /> Display Name
                 </Label>
-                <Input
-                  id="name"
-                  value={profile.display_name || ""}
-                  onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                  placeholder="Your name"
-                />
+                <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name" />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center gap-1.5">
                   <Phone className="h-4 w-4 text-muted-foreground" /> Phone Number
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={profile.phone || ""}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  placeholder="+1 (555) 123-4567"
-                />
+                <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 (555) 123-4567" />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="dob" className="flex items-center gap-1.5">
                   <Calendar className="h-4 w-4 text-muted-foreground" /> Date of Birth
                 </Label>
-                <Input
-                  id="dob"
-                  type="date"
-                  value={profile.date_of_birth || ""}
-                  onChange={(e) => setProfile({ ...profile, date_of_birth: e.target.value })}
-                />
+                <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4 text-muted-foreground" /> Address
                 </Label>
-                <Input
-                  id="address"
-                  value={profile.address || ""}
-                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                  placeholder="123 Main St, City, State"
-                />
+                <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, City, State" />
               </div>
-
-              <Button type="submit" className="shadow-hero" size="lg" disabled={saving}>
-                <Save className="h-4 w-4 mr-1" />
-                {saving ? "Saving..." : "Save Changes"}
+              <Button type="submit" className="shadow-hero" size="lg">
+                <Save className="h-4 w-4 mr-1" /> Save Changes
               </Button>
             </form>
           </TabsContent>
