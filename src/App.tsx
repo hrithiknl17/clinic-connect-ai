@@ -10,7 +10,6 @@ import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import BookAppointment from "./pages/BookAppointment";
 import DoctorDetail from "./pages/DoctorDetail";
-
 import VideoCall from "./pages/VideoCall";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
